@@ -12,8 +12,8 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 public class LyricTextView extends TextView {
-	private static final float MIN_PROGRESS = 0.00001f;//²»ÄÜÊÇ0
-	private static final float MAX_PROGRESS = 1f;
+	private float MIN_PROGRESS;
+	private float MAX_PROGRESS;
 	private Matrix matrix = new Matrix();
 	private LinearGradient shader;
 	private float progress = MIN_PROGRESS;
@@ -45,15 +45,21 @@ public class LyricTextView extends TextView {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 		
-		TextPaint paint = getPaint();
-		shader = new LinearGradient(0, 0, w, 0, new int[] {coverColor, coverColor, defaultColor}, new float[] {0, 0.99999f, 1}, TileMode.CLAMP);
-		paint.setShader(shader);
+		if (w > 0) {
+			TextPaint paint = getPaint();
+			shader = new LinearGradient(0, 0, w, 0, new int[] {coverColor, defaultColor}, new float[] {1f * (w - 1) / w, 1}, TileMode.CLAMP);
+			progress = MIN_PROGRESS = 1f / w;
+			MAX_PROGRESS = 1 + MIN_PROGRESS;
+			paint.setShader(shader);
+		}
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		matrix.setScale(progress, 1);
-		shader.setLocalMatrix(matrix);
+		if (shader != null) {
+			matrix.setScale(progress, 1);
+			shader.setLocalMatrix(matrix);
+		}
 		super.onDraw(canvas);
 	}
 	

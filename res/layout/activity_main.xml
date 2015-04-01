@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textSize="20sp"
-        android:textColor="#ffffff"
+        android:textColor="#cccccc"
         lyric:coverColor="#ff0000"
         android:text="面朝大海, 春暖花开"/>
 
