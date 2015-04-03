@@ -3,19 +3,22 @@ package com.example.lyrictextview;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
 import android.graphics.Matrix;
+import android.graphics.Shader;
 import android.graphics.Shader.TileMode;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 public class LyricTextView extends TextView {
-	private float MIN_PROGRESS;
-	private float MAX_PROGRESS;
+	private static final float MIN_PROGRESS = 0;
+	private static final float MAX_PROGRESS = 1;
 	private Matrix matrix = new Matrix();
-	private LinearGradient shader;
+	private Shader shader;
 	private float progress = MIN_PROGRESS;
 	private int coverColor, defaultColor;
 
@@ -47,9 +50,10 @@ public class LyricTextView extends TextView {
 		
 		if (w > 0) {
 			TextPaint paint = getPaint();
-			shader = new LinearGradient(0, 0, w, 0, new int[] {coverColor, defaultColor}, new float[] {1f * (w - 1) / w, 1}, TileMode.CLAMP);
-			progress = MIN_PROGRESS = 1f / w;
-			MAX_PROGRESS = 1 + MIN_PROGRESS;
+			Bitmap bm = Bitmap.createBitmap(2, 1, Config.RGB_565);
+			bm.setPixel(0, 0, coverColor);
+			bm.setPixel(1, 0, defaultColor);
+			shader = new BitmapShader(bm, TileMode.CLAMP, TileMode.CLAMP);
 			paint.setShader(shader);
 		}
 	}
@@ -57,7 +61,7 @@ public class LyricTextView extends TextView {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (shader != null) {
-			matrix.setScale(progress, 1);
+			matrix.setTranslate(getWidth() * progress - 1, 0);
 			shader.setLocalMatrix(matrix);
 		}
 		super.onDraw(canvas);
